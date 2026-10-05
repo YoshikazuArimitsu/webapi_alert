@@ -12,7 +12,12 @@ output "sns_topic_arn" {
 }
 
 output "alarm_name" {
-  value = aws_cloudwatch_metric_alarm.high_request_count.alarm_name
+  value = aws_cloudwatch_metric_alarm.previous_day_request_count.alarm_name
+}
+
+output "request_count_monitor_function_name" {
+  description = "前日比アクセス数を判定するLambda関数名"
+  value       = aws_lambda_function.request_count_monitor.function_name
 }
 
 output "slack_destination" {
@@ -22,5 +27,5 @@ output "slack_destination" {
 
 output "test_notification_command" {
   description = "Slack へのテスト通知を送るコマンド（確認後は StateValue=OK で戻す）"
-  value       = "aws cloudwatch set-alarm-state --region ${var.aws_region} --alarm-name ${aws_cloudwatch_metric_alarm.high_request_count.alarm_name} --state-value ALARM --state-reason \"テスト通知\""
+  value       = "aws cloudwatch set-alarm-state --region ${var.aws_region} --alarm-name ${aws_cloudwatch_metric_alarm.previous_day_request_count.alarm_name} --state-value ALARM --state-reason \"テスト通知\""
 }

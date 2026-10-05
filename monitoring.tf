@@ -20,22 +20,17 @@ resource "aws_sns_topic_policy" "alert" {
   policy = data.aws_iam_policy_document.alert_topic.json
 }
 
-resource "aws_cloudwatch_metric_alarm" "high_request_count" {
-  alarm_name = "${local.name}-high-request-count"
-  alarm_description = format(
-    "ALBへのリクエスト数が%d秒間に%d件を超えました",
-    var.alarm_period_seconds,
-    var.request_count_threshold,
-  )
-
-  namespace           = "AWS/ApplicationELB"
-  metric_name         = "RequestCount"
+resource "aws_cloudwatch_metric_alarm" "previous_day_request_count" {
+  alarm_name          = "${local.name}-request-count-exceeds-previous-day"
+  alarm_description   = "当日のALBアクセス数累計が前日の合計を超えました"
+  namespace           = "${local.name}/ALB"
+  metric_name         = "RequestCountExceedsPreviousDay"
   statistic           = "Sum"
-  period              = var.alarm_period_seconds
-  evaluation_periods  = var.alarm_evaluation_periods
-  datapoints_to_alarm = var.alarm_datapoints_to_alarm
-  threshold           = var.request_count_threshold
-  comparison_operator = "GreaterThanThreshold"
+  period              = 300
+  evaluation_periods  = 1
+  datapoints_to_alarm = 1
+  threshold           = 1
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   treat_missing_data  = "notBreaching"
 
   dimensions = {

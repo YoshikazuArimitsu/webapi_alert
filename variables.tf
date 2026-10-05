@@ -81,35 +81,18 @@ variable "lambda_log_retention_days" {
 }
 
 ############################################
-# アクセス過多アラーム
+# 前日比アクセス数アラーム
 ############################################
-variable "request_count_threshold" {
-  description = "この件数を「超えた」らアラーム（評価期間あたりの ALB RequestCount 合計）"
-  type        = number
-  default     = 1000
+variable "comparison_timezone" {
+  description = "前日・当日の境界に使用する IANA タイムゾーン"
+  type        = string
+  default     = "Asia/Tokyo"
 }
 
-variable "alarm_period_seconds" {
-  description = "RequestCount を集計する期間（秒）。60 の倍数"
-  type        = number
-  default     = 60
-
-  validation {
-    condition     = var.alarm_period_seconds >= 60 && var.alarm_period_seconds % 60 == 0
-    error_message = "alarm_period_seconds は 60 以上の 60 の倍数にしてください。"
-  }
-}
-
-variable "alarm_evaluation_periods" {
-  description = "評価する期間の数"
-  type        = number
-  default     = 1
-}
-
-variable "alarm_datapoints_to_alarm" {
-  description = "評価期間のうち、閾値超過が何回あればアラームにするか（evaluation_periods 以下）"
-  type        = number
-  default     = 1
+variable "request_count_monitor_schedule_expression" {
+  description = "前日比を判定するEventBridgeスケジュール式"
+  type        = string
+  default     = "rate(5 minutes)"
 }
 
 variable "notify_on_recovery" {
